@@ -1,0 +1,8 @@
+const DB_NAME="StockMarketInvestmentCompanyDB";let db;
+const STORES=["years","buys","sells","incomes","expenses","accounts","journals"];
+function openDB(){return new Promise((resolve,reject)=>{const req=indexedDB.open(DB_NAME,2);req.onupgradeneeded=e=>{const d=e.target.result;STORES.forEach(s=>{if(!d.objectStoreNames.contains(s))d.createObjectStore(s,{keyPath:"id",autoIncrement:true})})};req.onsuccess=e=>{db=e.target.result;resolve()};req.onerror=()=>reject(req.error)})}
+function dbAdd(store,value){return new Promise((resolve,reject)=>{const r=db.transaction(store,"readwrite").objectStore(store).add(value);r.onsuccess=()=>resolve(r.result);r.onerror=()=>reject(r.error)})}
+function dbGetAll(store){return new Promise((resolve,reject)=>{const r=db.transaction(store).objectStore(store).getAll();r.onsuccess=()=>resolve(r.result);r.onerror=()=>reject(r.error)})}
+function dbDelete(store,id){return new Promise((resolve,reject)=>{const r=db.transaction(store,"readwrite").objectStore(store).delete(id);r.onsuccess=()=>resolve();r.onerror=()=>reject(r.error)})}
+function dbClear(store){return new Promise((resolve,reject)=>{const r=db.transaction(store,"readwrite").objectStore(store).clear();r.onsuccess=()=>resolve();r.onerror=()=>reject(r.error)})}
+function dbPut(store,value){return new Promise((resolve,reject)=>{const r=db.transaction(store,"readwrite").objectStore(store).put(value);r.onsuccess=()=>resolve();r.onerror=()=>reject(r.error)})}
