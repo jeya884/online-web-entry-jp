@@ -1,0 +1,172 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Stock Market Investment Company</title>
+<link rel="stylesheet" href="css/style.css">
+<!-- Excel import library: supports XLSX, XLS, CSV, XLSB and other common spreadsheet formats -->
+<script src="https://cdn.jsdelivr.net/npm/xlsx@0.18.5/dist/xlsx.full.min.js"></script>
+</head>
+<body>
+<div id="loginView" class="login-screen">
+  <div class="login-card">
+    <h1>STOCK MARKET INVESTMENT</h1>
+    <p>Company Investment & Financial Accounting System</p>
+    <input id="loginUser" placeholder="Username" autocomplete="username">
+    <input id="loginPass" type="password" placeholder="Password" autocomplete="current-password">
+    <button id="loginBtn">Login</button>
+  </div>
+</div>
+
+<div id="appView" class="app hidden">
+  <aside class="sidebar">
+    <h2>INVEST PRO</h2>
+    <p class="tagline">Investment • Trading • Accounting</p>
+    <div class="year-box">
+      <label>Financial Year</label>
+      <select id="yearSelect"></select>
+      <button id="addYearBtn">+ Add Financial Year</button>
+    </div>
+    <button class="nav active" data-page="dashboard">Dashboard</button>
+    <button class="nav" data-page="buy">Buy Stock Entry</button>
+    <button class="nav" data-page="sell">Sell Stock Entry</button>
+    <button class="nav" data-page="import">Excel Import</button>
+    <button class="nav" data-page="portfolio">Portfolio</button>
+    <button class="nav" data-page="income">Profit / Income</button>
+    <button class="nav" data-page="expense">Expenses</button>
+    <button class="nav" data-page="accounts">Chart of Accounts</button>
+    <button class="nav" data-page="journal">Journal Entry</button>
+    <button class="nav" data-page="reports">Financial Reports</button>
+    <button class="nav" data-page="backup">Backup / Restore</button>
+    <button id="logoutBtn" class="logout">Logout</button>
+  </aside>
+
+  <main class="main">
+    <header>
+      <div><h1 id="pageTitle">Dashboard</h1><span id="selectedYearLabel"></span></div>
+      <button class="header-print" id="printCurrent">Print Current Page</button>
+    </header>
+
+    <section id="dashboard" class="page active">
+      <h2>Company Dashboard</h2>
+      <div class="cards">
+        <div class="card"><span>Total Investment</span><b id="dashInvestment">₹0.00</b></div>
+        <div class="card"><span>Current Holdings Cost</span><b id="dashHolding">₹0.00</b></div>
+        <div class="card"><span>Realized P/L</span><b id="dashRealized">₹0.00</b></div>
+        <div class="card"><span>Other Income</span><b id="dashIncome">₹0.00</b></div>
+        <div class="card"><span>Total Expenses</span><b id="dashExpense">₹0.00</b></div>
+        <div class="card"><span>Net Profit / Loss</span><b id="dashNet">₹0.00</b></div>
+      </div>
+    </section>
+
+    <section id="buy" class="page">
+      <div class="section-head"><h2>Buy Stock Entry</h2><button class="closeBtn" data-close>✕ Close</button></div>
+      <form id="buyForm" class="entry-grid">
+        <input id="buyDate" type="datetime-local" required>
+        <input id="buyName" placeholder="Stock Name" required>
+        <input id="buyExchange" placeholder="Exchange (NSE/BSE)">
+        <input id="buyOrderQty" type="number" min="0" placeholder="Order Qty">
+        <input id="buyExecQty" type="number" min="0" placeholder="Execution Qty" required>
+        <input id="buyDisclQty" type="number" min="0" value="0" placeholder="Disclosed Qty">
+        <input id="buyOrderPrice" type="number" step="0.01" placeholder="Order Price">
+        <input id="buyTriggerPrice" type="number" step="0.01" value="0" placeholder="Trigger Price">
+        <select id="buyOrderType"><option>MKT</option><option>LMT</option><option>SL</option><option>SL-M</option></select>
+        <select id="buyProduct"><option>Cash</option><option>Intraday</option><option>Delivery</option><option>Margin</option></select>
+        <input id="buyBrokerage" type="number" step="0.01" value="0" placeholder="Brokerage / Charges">
+        <input id="buyStatus" value="Confirmed Trade" placeholder="Status">
+        <input id="buyReason" value="---" placeholder="Reason">
+        <button type="submit">Save BUY Entry</button>
+      </form>
+      <div class="action-row"><button id="printBuys">Print Buy Report</button></div>
+      <div class="table-wrap"><table><thead><tr>
+        <th>Date & Time</th><th>Name</th><th>Exchange</th><th>Order Qty</th><th>Execution Qty</th><th>Price</th><th>Total Cost</th><th>Action</th>
+      </tr></thead><tbody id="buyTable"></tbody></table></div>
+    </section>
+
+    <section id="sell" class="page">
+      <div class="section-head"><h2>Sell Stock Entry</h2><button class="closeBtn" data-close>✕ Close</button></div>
+      <form id="sellForm" class="entry-grid">
+        <input id="sellDate" type="datetime-local" required>
+        <select id="sellStock" required></select>
+        <input id="sellExchange" placeholder="Exchange (auto / edit)">
+        <input id="sellOrderQty" type="number" min="0" placeholder="Order Qty">
+        <input id="sellExecQty" type="number" min="1" placeholder="Execution Qty" required>
+        <input id="sellDisclQty" type="number" min="0" value="0" placeholder="Disclosed Qty">
+        <input id="sellOrderPrice" type="number" step="0.01" placeholder="Order Price">
+        <input id="sellTriggerPrice" type="number" step="0.01" value="0" placeholder="Trigger Price">
+        <select id="sellOrderType"><option>MKT</option><option>LMT</option><option>SL</option><option>SL-M</option></select>
+        <select id="sellProduct"><option>Cash</option><option>Intraday</option><option>Delivery</option><option>Margin</option></select>
+        <input id="sellBrokerage" type="number" step="0.01" value="0" placeholder="Brokerage / Charges">
+        <input id="sellStatus" value="Confirmed Trade" placeholder="Status">
+        <input id="sellReason" value="---" placeholder="Reason">
+        <button type="submit">Save SELL Entry</button>
+      </form>
+      <div class="action-row"><button id="printSells">Print Sell Report</button></div>
+      <div class="table-wrap"><table><thead><tr>
+        <th>Date & Time</th><th>Name</th><th>Exchange</th><th>Execution Qty</th><th>Sell Amount</th><th>Cost</th><th>Realized P/L</th><th>Action</th>
+      </tr></thead><tbody id="sellTable"></tbody></table></div>
+    </section>
+
+    <section id="import" class="page">
+      <div class="section-head"><h2>Excel / Spreadsheet Import</h2><button class="closeBtn" data-close>✕ Close</button></div>
+      <div class="import-box">
+        <h3>Import trading statements</h3>
+        <p>Supported formats: XLSX, XLS, XLSB, CSV and other formats supported by the spreadsheet reader.</p>
+        <p>Your Excel format is automatically mapped from columns such as <b>Name, Date & Time, Action, Exchange, Order Qty, Execution Qty, Discl. Qty, Order Price, Trigger Price, Order Type, Product, Status, Reason</b>.</p>
+        <input id="excelFile" type="file" accept=".xlsx,.xls,.xlsb,.csv,.ods">
+        <select id="importAction"><option value="AUTO">Auto detect BUY / SELL from Action column</option><option value="BUY">Import all as BUY</option><option value="SELL">Import all as SELL</option></select>
+        <button id="importExcelBtn">Import Spreadsheet</button>
+      </div>
+      <div id="importMessage" class="message"></div>
+      <div class="table-wrap"><table><thead><tr><th>Preview / Import Result</th></tr></thead><tbody id="importPreview"></tbody></table></div>
+    </section>
+
+    <section id="portfolio" class="page">
+      <div class="section-head"><h2>Portfolio Holdings</h2><button class="closeBtn" data-close>✕ Close</button></div>
+      <div class="action-row"><button id="printPortfolio">Print Portfolio</button></div>
+      <div class="table-wrap"><table><thead><tr><th>Stock</th><th>Exchange</th><th>Quantity</th><th>Average Buy Cost</th><th>Investment</th><th>Action</th></tr></thead><tbody id="portfolioTable"></tbody></table></div>
+    </section>
+
+    <section id="income" class="page">
+      <div class="section-head"><h2>Profit / Income Entry</h2><button class="closeBtn" data-close>✕ Close</button></div>
+      <form id="incomeForm" class="entry-grid"><input id="incomeDate" type="date" required><input id="incomeCategory" placeholder="Category: Dividend / Interest / Other" required><input id="incomeDesc" placeholder="Description"><input id="incomeAmount" type="number" step="0.01" placeholder="Amount" required><button>Save Income</button></form>
+      <div id="incomeList"></div>
+    </section>
+
+    <section id="expense" class="page">
+      <div class="section-head"><h2>Expense Entry</h2><button class="closeBtn" data-close>✕ Close</button></div>
+      <form id="expenseForm" class="entry-grid"><input id="expenseDate" type="date" required><input id="expenseCategory" placeholder="Expense Category" required><input id="expenseDesc" placeholder="Description"><input id="expenseAmount" type="number" step="0.01" placeholder="Amount" required><button>Save Expense</button></form>
+      <div id="expenseList"></div>
+    </section>
+
+    <section id="accounts" class="page">
+      <div class="section-head"><h2>Chart of Accounts</h2><button class="closeBtn" data-close>✕ Close</button></div>
+      <form id="accountForm" class="entry-grid"><input id="accountName" placeholder="Account Name" required><select id="accountType"><option>Asset</option><option>Liability</option><option>Capital</option><option>Income</option><option>Expense</option></select><button>Add Account</button></form>
+      <div class="table-wrap"><table><thead><tr><th>Account</th><th>Type</th><th>Action</th></tr></thead><tbody id="accountTable"></tbody></table></div>
+    </section>
+
+    <section id="journal" class="page">
+      <div class="section-head"><h2>Journal Entry</h2><button class="closeBtn" data-close>✕ Close</button></div>
+      <form id="journalForm" class="entry-grid"><input id="journalDate" type="date" required><select id="debitAccount" required></select><select id="creditAccount" required></select><input id="journalAmount" type="number" step="0.01" placeholder="Amount" required><input id="journalNarration" placeholder="Narration"><button>Save Journal</button></form>
+      <div class="table-wrap"><table><thead><tr><th>Date</th><th>Debit</th><th>Credit</th><th>Amount</th><th>Narration</th><th>Action</th></tr></thead><tbody id="journalTable"></tbody></table></div>
+    </section>
+
+    <section id="reports" class="page">
+      <div class="section-head"><h2>Financial Accounting Statements</h2><button class="closeBtn" data-close>✕ Close</button></div>
+      <div class="report-buttons"><button data-report="trading">Trading Report</button><button data-report="portfolio">Portfolio Report</button><button data-report="pl">Profit & Loss</button><button data-report="trial">Trial Balance</button><button data-report="balance">Balance Sheet</button><button id="printReport">Print Report</button></div>
+      <div id="reportOutput" class="report-output">Choose a report.</div>
+    </section>
+
+    <section id="backup" class="page">
+      <div class="section-head"><h2>Backup / Restore</h2><button class="closeBtn" data-close>✕ Close</button></div>
+      <button id="exportBtn">Export All Data Backup</button>
+      <input id="restoreFile" type="file" accept=".json">
+      <button id="restoreBtn">Restore Backup</button>
+    </section>
+  </main>
+</div>
+<script src="js/database.js"></script>
+<script src="js/app.js"></script>
+</body>
+</html>
